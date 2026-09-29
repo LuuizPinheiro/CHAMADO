@@ -1,4 +1,4 @@
-﻿# ==============================================================================
+# ==============================================================================
 # MÓDULO: Diagnóstico Detalhado do Sistema
 # ==============================================================================
 
@@ -11,11 +11,11 @@ function Get-SystemDiagnostics {
     $results = @()
 
     # --- SISTEMA OPERACIONAL ---
-    $os = Get-WmiObject -Class Win32_OperatingSystem
-    $comp = Get-WmiObject -Class Win32_ComputerSystem
-    $cpu = Get-WmiObject -Class Win32_Processor
-    $gpu = Get-WmiObject -Class Win32_VideoController
-    $bios = Get-WmiObject -Class Win32_BIOS
+    $os = Get-WmiObject -Class Win32_OperatingSystem -ErrorAction SilentlyContinue
+    $comp = Get-WmiObject -Class Win32_ComputerSystem -ErrorAction SilentlyContinue
+    $cpu = Get-WmiObject -Class Win32_Processor -ErrorAction SilentlyContinue
+    $gpu = Get-WmiObject -Class Win32_VideoController -ErrorAction SilentlyContinue
+    $bios = Get-WmiObject -Class Win32_BIOS -ErrorAction SilentlyContinue
 
     $results += @{ Category="SISTEMA"; Check="Sistema Operacional"; Value="$($os.Caption) Build $($os.BuildNumber)"; Level="INFO"; Fix=$null }
     $results += @{ Category="SISTEMA"; Check="Processador"; Value="$($cpu.Name)"; Level="INFO"; Fix=$null }
@@ -57,7 +57,7 @@ function Get-SystemDiagnostics {
     }
 
     # --- DISCOS ---
-    $disks = Get-WmiObject Win32_LogicalDisk -Filter "DriveType=3"
+    $disks = Get-WmiObject Win32_LogicalDisk -Filter "DriveType=3" -ErrorAction SilentlyContinue
     foreach ($d in $disks) {
         $freeGB = [math]::Round($d.FreeSpace / 1GB, 2)
         $totalGB = [math]::Round($d.Size / 1GB, 2)
@@ -114,9 +114,9 @@ function Get-SystemDiagnostics {
     }
 
     # --- REDE ---
-    $pingTest = Test-Connection -ComputerName "8.8.8.8" -Count 2 -Quiet
+    $pingTest = Test-Connection -ComputerName "8.8.8.8" -Count 2 -Quiet -ErrorAction SilentlyContinue
     if ($pingTest) {
-        $pingResult = Test-Connection -ComputerName "8.8.8.8" -Count 2
+        $pingResult = Test-Connection -ComputerName "8.8.8.8" -Count 2 -ErrorAction SilentlyContinue
         $avgLatency = [math]::Round(($pingResult | Measure-Object ResponseTime -Average).Average)
         if ($avgLatency -gt 100) {
             $results += @{ Category="REDE"; Check="Conectividade (Internet)"; Value="Online - Latência alta: $($avgLatency)ms"; Level="WARN"; Fix="NETWORK_RESET" }
@@ -279,11 +279,11 @@ function Invoke-ColetaRapida {
     Write-Header
     Write-SubHeader "COLETA RÁPIDA - INFORMAÇÕES PARA O CHAMADO"
 
-    $comp = Get-WmiObject -Class Win32_ComputerSystem
-    $os   = Get-WmiObject -Class Win32_OperatingSystem
-    $bios = Get-WmiObject -Class Win32_BIOS
-    $cpu  = Get-WmiObject -Class Win32_Processor
-    $gpu  = Get-WmiObject -Class Win32_VideoController
+    $comp = Get-WmiObject -Class Win32_ComputerSystem -ErrorAction SilentlyContinue
+    $os   = Get-WmiObject -Class Win32_OperatingSystem -ErrorAction SilentlyContinue
+    $bios = Get-WmiObject -Class Win32_BIOS -ErrorAction SilentlyContinue
+    $cpu  = Get-WmiObject -Class Win32_Processor -ErrorAction SilentlyContinue
+    $gpu  = Get-WmiObject -Class Win32_VideoController -ErrorAction SilentlyContinue
     $ram  = [math]::Round($comp.TotalPhysicalMemory / 1GB, 2)
     $ip   = (Get-NetIPAddress -AddressFamily IPv4 -ErrorAction SilentlyContinue | Where-Object { $_.InterfaceAlias -notmatch "Loopback" -and $_.IPAddress -ne "127.0.0.1" }).IPAddress -join ", "
     $mac  = (Get-NetAdapter | Where-Object { $_.Status -eq "Up" } | Select-Object -First 1).MacAddress

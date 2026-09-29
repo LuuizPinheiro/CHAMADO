@@ -1,4 +1,4 @@
-﻿# ==============================================================================
+# ==============================================================================
 # MÓDULO: Ferramentas de Rede
 # ==============================================================================
 
@@ -294,48 +294,63 @@ function Show-SavedWifi {
     Write-Header
     Write-SubHeader "REDES WI-FI SALVAS"
 
-    $profiles = netsh wlan show profiles 2>$null
+    Write-Host "   Buscando redes salvas no sistema..." -ForegroundColor Gray
     
-    # Captura os nomes através de regex para evitar problemas com acentos e idiomas diferentes.
-    # O formato de saída do netsh sempre tem espaços seguidos de " : " e depois o nome da rede.
-    $names = @()
-    foreach ($line in $profiles) {
-        if ($line -match "\s+:\s+(.+)$") {
-            $names += $Matches[1].Trim()
-        }
-    }
+    # Exporta perfis em formato XML para uma pasta temporaria para evitar problemas de idioma/encoding do CMD
+    $tempFolder = Join-Path $env:TEMP "ChamadoWifi_$([guid]::NewGuid().Guid)"
+    New-Item -ItemType Directory -Path $tempFolder -Force | Out-Null
+    
+    $exportOutput = netsh wlan export profile key=clear folder="$tempFolder" 2>$null
+    $xmlFiles = Get-ChildItem -Path $tempFolder -Filter "*.xml"
 
-    if (-not $names -or $names.Count -eq 0) {
-        Write-Status "Nenhuma rede Wi-Fi salva encontrada." "INFO"
+    if (-not $xmlFiles -or $xmlFiles.Count -eq 0) {
+        Write-Status "Nenhuma rede Wi-Fi salva ou placa Wi-Fi nao encontrada." "INFO"
+        Remove-Item -Path $tempFolder -Recurse -Force -ErrorAction SilentlyContinue
         Pause-Script
         return
     }
 
+    Write-Host ""
     Write-Host "   Rede                              Senha" -ForegroundColor $global:ThemeColor
     Write-Host "   --------------------------------  --------------------------------" -ForegroundColor DarkGray
 
     $reportLines = @()
-    $reportLines += "CHAMADO - Relatório de Redes Wi-Fi"
+    $reportLines += "CHAMADO - Relatorio de Redes Wi-Fi"
     $reportLines += "Gerado em: $(Get-Date -Format 'dd/MM/yyyy HH:mm:ss')"
     $reportLines += "------------------------------------------------------------------"
     $reportLines += "Rede                              Senha"
     $reportLines += "--------------------------------  --------------------------------"
 
-    foreach ($name in $names) {
-        $detail = netsh wlan show profile name="$name" key=clear 2>$null
-        $keyLine = $detail | Select-String "Conte.do da Chave|Key Content"
-        $key = if ($keyLine) { ($keyLine -split ":")[-1].Trim() } else { "(sem senha / protegida)" }
-        $displayName = $name.PadRight(34)
-        Write-Host "   $displayName$key"
-        $reportLines += "$displayName$key"
+    foreach ($file in $xmlFiles) {
+        try {
+            [xml]$xml = Get-Content $file.FullName -Raw -ErrorAction SilentlyContinue
+            
+            # O namespace padrao do XML gerado pelo netsh
+            $ns = @{ ns = "http://www.microsoft.com/networking/WLAN/profile/v1" }
+            
+            $nameNode = Select-Xml -Xml $xml -XPath "//ns:name" -Namespace $ns
+            $name = if ($nameNode) { $nameNode.Node.InnerText } else { "Desconhecido" }
+            
+            $keyNode = Select-Xml -Xml $xml -XPath "//ns:keyMaterial" -Namespace $ns
+            $key = if ($keyNode) { $keyNode.Node.InnerText } else { "(sem senha / protegida)" }
+            
+            $displayName = $name.PadRight(34)
+            Write-Host "   $displayName$key"
+            $reportLines += "$displayName$key"
+        } catch {
+            Write-Host "   [Erro ao ler um dos perfis]" -ForegroundColor Red
+        }
     }
+
+    # Limpeza dos arquivos temporarios
+    Remove-Item -Path $tempFolder -Recurse -Force -ErrorAction SilentlyContinue
 
     $reportPath = Join-Path $global:DataDir "wifi_report_$(Get-Date -Format 'yyyyMMdd_HHmmss').txt"
     $reportLines | Set-Content -Path $reportPath -Encoding UTF8 -Force
 
     Write-Host ""
-    Write-Host "   Total: $($names.Count) redes salvas" -ForegroundColor DarkGray
-    Write-Status "Relatório salvo em: data\$(Split-Path $reportPath -Leaf)" "OK"
-    Write-Log "Redes Wi-Fi salvas listadas. Relatório gerado: $reportPath"
+    Write-Host "   Total: $($xmlFiles.Count) redes salvas" -ForegroundColor DarkGray
+    Write-Status "Relatorio salvo em: data\$(Split-Path $reportPath -Leaf)" "OK"
+    Write-Log "Redes Wi-Fi salvas listadas. Relatorio gerado: $reportPath"
     Pause-Script
 }
