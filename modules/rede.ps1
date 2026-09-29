@@ -1,4 +1,4 @@
-﻿# ==============================================================================
+# ==============================================================================
 # MÓDULO: Ferramentas de Rede
 # ==============================================================================
 
@@ -295,9 +295,14 @@ function Show-SavedWifi {
     Write-SubHeader "REDES WI-FI SALVAS"
 
     $profiles = netsh wlan show profiles 2>$null
-    $names = ($profiles | Select-String "Perfil de Todos os Usu" | ForEach-Object { ($_ -split ":")[-1].Trim() })
-    if (-not $names) {
-        $names = ($profiles | Select-String "All User Profile" | ForEach-Object { ($_ -split ":")[-1].Trim() })
+    
+    # Captura os nomes através de regex para evitar problemas com acentos e idiomas diferentes.
+    # O formato de saída do netsh sempre tem espaços seguidos de " : " e depois o nome da rede.
+    $names = @()
+    foreach ($line in $profiles) {
+        if ($line -match "\s+:\s+(.+)$") {
+            $names += $Matches[1].Trim()
+        }
     }
 
     if (-not $names -or $names.Count -eq 0) {
