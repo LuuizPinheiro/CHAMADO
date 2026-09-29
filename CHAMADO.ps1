@@ -1,4 +1,4 @@
-<#
+﻿<#
 .SYNOPSIS
     CHAMADO v2.0 - Central de Suporte Técnico
 .DESCRIPTION
