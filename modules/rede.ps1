@@ -314,16 +314,28 @@ function Show-SavedWifi {
     Write-Host "   Rede                              Senha" -ForegroundColor $global:ThemeColor
     Write-Host "   --------------------------------  --------------------------------" -ForegroundColor DarkGray
 
+    $reportLines = @()
+    $reportLines += "CHAMADO - Relatório de Redes Wi-Fi"
+    $reportLines += "Gerado em: $(Get-Date -Format 'dd/MM/yyyy HH:mm:ss')"
+    $reportLines += "------------------------------------------------------------------"
+    $reportLines += "Rede                              Senha"
+    $reportLines += "--------------------------------  --------------------------------"
+
     foreach ($name in $names) {
         $detail = netsh wlan show profile name="$name" key=clear 2>$null
         $keyLine = $detail | Select-String "Conte.do da Chave|Key Content"
         $key = if ($keyLine) { ($keyLine -split ":")[-1].Trim() } else { "(sem senha / protegida)" }
         $displayName = $name.PadRight(34)
         Write-Host "   $displayName$key"
+        $reportLines += "$displayName$key"
     }
+
+    $reportPath = Join-Path $global:DataDir "wifi_report_$(Get-Date -Format 'yyyyMMdd_HHmmss').txt"
+    $reportLines | Set-Content -Path $reportPath -Encoding UTF8 -Force
 
     Write-Host ""
     Write-Host "   Total: $($names.Count) redes salvas" -ForegroundColor DarkGray
-    Write-Log "Redes Wi-Fi salvas listadas ($($names.Count) perfis)."
+    Write-Status "Relatório salvo em: data\$(Split-Path $reportPath -Leaf)" "OK"
+    Write-Log "Redes Wi-Fi salvas listadas. Relatório gerado: $reportPath"
     Pause-Script
 }
