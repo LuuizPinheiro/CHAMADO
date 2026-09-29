@@ -8,13 +8,13 @@ function Invoke-MenuRede {
         Write-Header
         Write-SubHeader "FERRAMENTAS DE REDE"
 
-        Write-MenuOption "1"  "Informações de Rede Completas"
+        Write-MenuOption "1"  "Informacoes de Rede Completas"
         Write-MenuOption "2"  "Testar Conectividade (Ping Google)"
         Write-MenuOption "3"  "Ping Customizado"
         Write-MenuOption "4"  "Traceroute (Rastrear Rota)"
         Write-MenuOption "5"  "Redefinir Rede Completa"
         Write-MenuOption "6"  "Alterar DNS (Google / Cloudflare / OpenDNS)"
-        Write-MenuOption "7"  "Restaurar DNS Automático (DHCP)"
+        Write-MenuOption "7"  "Restaurar DNS Automatico (DHCP)"
         Write-MenuOption "8"  "Verificar Portas em Uso"
         Write-MenuOption "9"  "Listar Redes Wi-Fi Salvas (com Senhas)"
         Write-MenuOption "0"  "Voltar ao Menu Principal"

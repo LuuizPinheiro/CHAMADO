@@ -1,4 +1,4 @@
-﻿<#
+<#
 .SYNOPSIS
     CHAMADO v2.0 - Central de Suporte Técnico
 .DESCRIPTION
@@ -11,7 +11,6 @@
 # INICIALIZAÇÃO GLOBAL
 # ==============================================================================
 $ErrorActionPreference = "SilentlyContinue"
-[Console]::OutputEncoding = [System.Text.Encoding]::UTF8
 
 $global:AppVersion  = "v2.0"
 $global:AppName     = "CHAMADO"
@@ -49,6 +48,7 @@ function Write-Log {
 }
 
 function Write-Header {
+    [Console]::ResetColor()
     Clear-Host
     $c = $global:ThemeColor
     Write-Host ""
@@ -145,7 +145,8 @@ $moduleFiles = @(
     "pos-formatacao.ps1",
     "ferramentas.ps1",
     "auto-diagnostico.ps1",
-    "analisador-disco.ps1"
+    "analisador-disco.ps1",
+    "desempenho.ps1"
 )
 
 foreach ($mod in $moduleFiles) {
@@ -167,19 +168,20 @@ function Show-MainMenu {
 
         Write-Host "   MENU PRINCIPAL" -ForegroundColor White
         Write-Host ""
-        Write-MenuOption "1"  "Auto-Diagnóstico (Análise Completa + Correções)"
-        Write-MenuOption "2"  "Diagnóstico Detalhado do Sistema"
+        Write-MenuOption "1"  "Auto-Diagnostico (Analise Completa + Correcoes)"
+        Write-MenuOption "2"  "Diagnostico Detalhado do Sistema"
         Write-MenuOption "3"  "Ferramentas de Rede"
-        Write-MenuOption "4"  "Reparos e Manutenção"
-        Write-MenuOption "5"  "Otimização para Jogos (Gaming Mode)"
-        Write-MenuOption "6"  "Segurança e Privacidade"
-        Write-MenuOption "7"  "Limpeza Profunda"
-        Write-MenuOption "8"  "Backup Rápido (Ninja Backup)"
-        Write-MenuOption "9"  "Pós-Formatação: Instalar Programas"
-        Write-MenuOption "10" "Ferramentas do Técnico (Atalhos)"
-        Write-MenuOption "11" "Coleta Rápida (Info p/ Chamado)"
-        Write-MenuOption "12" "Analisador de Disco (Espaço e Arquivos)"
-        Write-MenuOption "13" "Personalizar Tema" $global:ThemeColor
+        Write-MenuOption "4"  "Reparos e Manutencao"
+        Write-MenuOption "5"  "Otimizacao para Jogos (Gaming Mode)"
+        Write-MenuOption "6"  "Reviver PC Antigo (Desempenho)"
+        Write-MenuOption "7"  "Seguranca e Privacidade"
+        Write-MenuOption "8"  "Limpeza Profunda"
+        Write-MenuOption "9"  "Backup Rapido (Ninja Backup)"
+        Write-MenuOption "10" "Pos-Formatacao: Instalar Programas"
+        Write-MenuOption "11" "Ferramentas do Tecnico (Atalhos)"
+        Write-MenuOption "12" "Coleta Rapida (Info p/ Chamado)"
+        Write-MenuOption "13" "Analisador de Disco (Espaco e Arquivos)"
+        Write-MenuOption "14" "Personalizar Tema" $global:ThemeColor
         Write-MenuOption "0"  "Sair" "DarkGray"
 
         $choice = Get-Choice "Digite a opção desejada"
@@ -190,14 +192,15 @@ function Show-MainMenu {
             "3"  { Invoke-MenuRede }
             "4"  { Invoke-MenuReparos }
             "5"  { Invoke-MenuGaming }
-            "6"  { Invoke-MenuSeguranca }
-            "7"  { Invoke-MenuLimpeza }
-            "8"  { Invoke-MenuBackup }
-            "9"  { Invoke-MenuPosFormatacao }
-            "10" { Invoke-MenuFerramentas }
-            "11" { Invoke-ColetaRapida }
-            "12" { Invoke-MenuAnalisadorDisco }
-            "13" { Invoke-MenuTema }
+            "6"  { Invoke-MenuDesempenho }
+            "7"  { Invoke-MenuSeguranca }
+            "8"  { Invoke-MenuLimpeza }
+            "9"  { Invoke-MenuBackup }
+            "10" { Invoke-MenuPosFormatacao }
+            "11" { Invoke-MenuFerramentas }
+            "12" { Invoke-ColetaRapida }
+            "13" { Invoke-MenuAnalisadorDisco }
+            "14" { Invoke-MenuTema }
             "0"  {
                 Write-Log "CHAMADO encerrado pelo usuário."
                 Write-Host ""
