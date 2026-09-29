@@ -32,28 +32,45 @@ function Get-SystemDiagnostics {
     }
 
     # --- UPTIME ---
-    $uptime = (New-TimeSpan -Start $os.ConvertToDateTime($os.LastBootUpTime) -End (Get-Date)).TotalDays
-    $uptimeRound = [math]::Round($uptime, 1)
-    if ($uptimeRound -gt 15) {
-        $results += @{ Category="DESEMPENHO"; Check="Uptime do Sistema"; Value="$uptimeRound dias sem reiniciar"; Level="WARN"; Fix="RESTART_SUGGESTION" }
-    } elseif ($uptimeRound -gt 7) {
-        $results += @{ Category="DESEMPENHO"; Check="Uptime do Sistema"; Value="$uptimeRound dias"; Level="WARN"; Fix="RESTART_SUGGESTION" }
+    if ($null -ne $os -and $null -ne $os.LastBootUpTime) {
+        try {
+            $uptime = (New-TimeSpan -Start $os.ConvertToDateTime($os.LastBootUpTime) -End (Get-Date)).TotalDays
+            $uptimeRound = [math]::Round($uptime, 1)
+            if ($uptimeRound -gt 15) {
+                $results += @{ Category="DESEMPENHO"; Check="Uptime do Sistema"; Value="$uptimeRound dias sem reiniciar"; Level="WARN"; Fix="RESTART_SUGGESTION" }
+            } elseif ($uptimeRound -gt 7) {
+                $results += @{ Category="DESEMPENHO"; Check="Uptime do Sistema"; Value="$uptimeRound dias"; Level="WARN"; Fix="RESTART_SUGGESTION" }
+            } else {
+                $results += @{ Category="DESEMPENHO"; Check="Uptime do Sistema"; Value="$uptimeRound dias"; Level="OK"; Fix=$null }
+            }
+        } catch {
+            $results += @{ Category="DESEMPENHO"; Check="Uptime do Sistema"; Value="Erro ao calcular"; Level="WARN"; Fix=$null }
+        }
     } else {
-        $results += @{ Category="DESEMPENHO"; Check="Uptime do Sistema"; Value="$uptimeRound dias"; Level="OK"; Fix=$null }
+        $results += @{ Category="DESEMPENHO"; Check="Uptime do Sistema"; Value="Desconhecido"; Level="WARN"; Fix=$null }
     }
 
     # --- RAM ---
-    $totalRAM = [math]::Round($comp.TotalPhysicalMemory / 1GB, 2)
-    $freeRAM = [math]::Round(($os.FreePhysicalMemory * 1KB) / 1GB, 2)
-    $usedRAM = [math]::Round($totalRAM - $freeRAM, 2)
-    $ramPercent = [math]::Round(($freeRAM / $totalRAM) * 100)
+    if ($null -ne $comp -and $null -ne $comp.TotalPhysicalMemory -and $null -ne $os -and $null -ne $os.FreePhysicalMemory) {
+        $totalRAM = [math]::Round($comp.TotalPhysicalMemory / 1GB, 2)
+        $freeRAM = [math]::Round(($os.FreePhysicalMemory * 1KB) / 1GB, 2)
+        
+        if ($totalRAM -gt 0) {
+            $usedRAM = [math]::Round($totalRAM - $freeRAM, 2)
+            $ramPercent = [math]::Round(($freeRAM / $totalRAM) * 100)
 
-    if ($ramPercent -lt 15) {
-        $results += @{ Category="DESEMPENHO"; Check="Memória RAM"; Value="$($usedRAM)GB usada de $($totalRAM)GB ($($ramPercent)% livre)"; Level="CRIT"; Fix="RAM_HIGH" }
-    } elseif ($ramPercent -lt 30) {
-        $results += @{ Category="DESEMPENHO"; Check="Memória RAM"; Value="$($usedRAM)GB usada de $($totalRAM)GB ($($ramPercent)% livre)"; Level="WARN"; Fix=$null }
+            if ($ramPercent -lt 15) {
+                $results += @{ Category="DESEMPENHO"; Check="Memória RAM"; Value="$($usedRAM)GB usada de $($totalRAM)GB ($($ramPercent)% livre)"; Level="CRIT"; Fix="RAM_HIGH" }
+            } elseif ($ramPercent -lt 30) {
+                $results += @{ Category="DESEMPENHO"; Check="Memória RAM"; Value="$($usedRAM)GB usada de $($totalRAM)GB ($($ramPercent)% livre)"; Level="WARN"; Fix=$null }
+            } else {
+                $results += @{ Category="DESEMPENHO"; Check="Memória RAM"; Value="$($usedRAM)GB usada de $($totalRAM)GB ($($ramPercent)% livre)"; Level="OK"; Fix=$null }
+            }
+        } else {
+            $results += @{ Category="DESEMPENHO"; Check="Memória RAM"; Value="Erro de divisão por zero"; Level="WARN"; Fix=$null }
+        }
     } else {
-        $results += @{ Category="DESEMPENHO"; Check="Memória RAM"; Value="$($usedRAM)GB usada de $($totalRAM)GB ($($ramPercent)% livre)"; Level="OK"; Fix=$null }
+        $results += @{ Category="DESEMPENHO"; Check="Memória RAM"; Value="Desconhecido"; Level="WARN"; Fix=$null }
     }
 
     # --- DISCOS ---
@@ -284,12 +301,12 @@ function Invoke-ColetaRapida {
     $bios = Get-WmiObject -Class Win32_BIOS -ErrorAction SilentlyContinue
     $cpu  = Get-WmiObject -Class Win32_Processor -ErrorAction SilentlyContinue
     $gpu  = Get-WmiObject -Class Win32_VideoController -ErrorAction SilentlyContinue
-    $ram  = [math]::Round($comp.TotalPhysicalMemory / 1GB, 2)
+    $ram  = if ($null -ne $comp -and $null -ne $comp.TotalPhysicalMemory) { [math]::Round($comp.TotalPhysicalMemory / 1GB, 2) } else { "Desconhecido" }
     $ip   = (Get-NetIPAddress -AddressFamily IPv4 -ErrorAction SilentlyContinue | Where-Object { $_.InterfaceAlias -notmatch "Loopback" -and $_.IPAddress -ne "127.0.0.1" }).IPAddress -join ", "
     $mac  = (Get-NetAdapter | Where-Object { $_.Status -eq "Up" } | Select-Object -First 1).MacAddress
     $gw   = (Get-NetRoute -DestinationPrefix "0.0.0.0/0" -ErrorAction SilentlyContinue).NextHop | Select-Object -First 1
     $dns  = (Get-DnsClientServerAddress -AddressFamily IPv4 -ErrorAction SilentlyContinue | Where-Object { $_.ServerAddresses } | Select-Object -First 1).ServerAddresses -join ", "
-    $uptime = [math]::Round((New-TimeSpan -Start $os.ConvertToDateTime($os.LastBootUpTime) -End (Get-Date)).TotalHours, 1)
+    $uptime = if ($null -ne $os -and $null -ne $os.LastBootUpTime) { [math]::Round((New-TimeSpan -Start $os.ConvertToDateTime($os.LastBootUpTime) -End (Get-Date)).TotalHours, 1) } else { "Desconhecido" }
 
     $info = @"
 ============================================
