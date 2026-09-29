@@ -1,0 +1,11 @@
+# Logs e configurações geradas em runtime
+data/
+!data/.gitkeep
+
+# Arquivos temporários do Windows
+*.tmp
+Thumbs.db
+Desktop.ini
+
+# Arquivos do VS Code
+.vscode/
