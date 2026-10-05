@@ -30,7 +30,9 @@ O **CHAMADO** é uma ferramenta de terminal para Windows que funciona como um **
 - 🛡️ **Segurança** (Defender, Firewall, BitLocker, RDP)
 - 🧹 **Limpeza profunda** com relatório de espaço liberado
 - 💾 **Backup rápido** (Ninja Backup) com Robocopy
-- 📦 **Pós-formatação** com 7 packs de programas via Winget
+- 📦 **Pós-formatação avançada** com 13 pacotes e mais de 110 programas via Winget
+- 🖨️ **Impressoras de Rede** com busca automática e instalação via IP/WSD
+- 📊 **Analisador de Disco** ultrarrápido em C# para arquivos grandes
 - 🧰 **Atalhos rápidos** para ferramentas do Windows
 - 🎨 **Tema customizável** (6 cores)
 
@@ -65,10 +67,13 @@ CHAMADO/
 │   ├── rede.ps1             # Ferramentas de rede
 │   ├── reparos.ps1          # Reparos e manutenção
 │   ├── otimizacao-gaming.ps1# Otimizações para jogos
+│   ├── desempenho.ps1       # Otimizações para computadores antigos
 │   ├── seguranca.ps1        # Segurança e privacidade
 │   ├── limpeza.ps1          # Limpeza profunda
 │   ├── backup.ps1           # Ninja Backup
 │   ├── pos-formatacao.ps1   # Instalação de programas
+│   ├── analisador-disco.ps1 # Scanner C# para localizar arquivos gigantes
+│   ├── impressoras.ps1      # Busca e instalação de impressoras de rede
 │   ├── ferramentas.ps1      # Atalhos do técnico
 │   └── tema.ps1             # Personalização visual
 ├── data/                    # Criado automaticamente (logs, config)
@@ -114,7 +119,9 @@ Contribuições são muito bem-vindas! Como o projeto é modular, você pode:
 - 🛡️ **Security** (Defender, Firewall, BitLocker, RDP)
 - 🧹 **Deep cleanup** with freed space report
 - 💾 **Quick backup** (Ninja Backup) with Robocopy
-- 📦 **Post-format setup** with 7 program packs via Winget
+- 📦 **Advanced Post-format setup** with 13 packs and >110 programs via Winget
+- 🖨️ **Network printers** with auto-discovery and IP/WSD installation
+- 📊 **Disk analyzer** ultra-fast C#-based engine for large files
 - 🧰 **Quick shortcuts** to Windows management tools
 - 🎨 **Customizable theme** (6 colors)
 
