@@ -146,7 +146,8 @@ $moduleFiles = @(
     "ferramentas.ps1",
     "auto-diagnostico.ps1",
     "analisador-disco.ps1",
-    "desempenho.ps1"
+    "desempenho.ps1",
+    "impressoras.ps1"
 )
 
 foreach ($mod in $moduleFiles) {
@@ -181,7 +182,8 @@ function Show-MainMenu {
         Write-MenuOption "11" "Ferramentas do Tecnico (Atalhos)"
         Write-MenuOption "12" "Coleta Rapida (Info p/ Chamado)"
         Write-MenuOption "13" "Analisador de Disco (Espaco e Arquivos)"
-        Write-MenuOption "14" "Personalizar Tema" $global:ThemeColor
+        Write-MenuOption "14" "Impressoras de Rede (Detectar e Conectar)"
+        Write-MenuOption "15" "Personalizar Tema" $global:ThemeColor
         Write-MenuOption "0"  "Sair" "DarkGray"
 
         $choice = Get-Choice "Digite a opção desejada"
@@ -200,7 +202,8 @@ function Show-MainMenu {
             "11" { Invoke-MenuFerramentas }
             "12" { Invoke-ColetaRapida }
             "13" { Invoke-MenuAnalisadorDisco }
-            "14" { Invoke-MenuTema }
+            "14" { Invoke-MenuImpressoras }
+            "15" { Invoke-MenuTema }
             "0"  {
                 Write-Log "CHAMADO encerrado pelo usuário."
                 Write-Host ""
