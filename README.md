@@ -26,7 +26,7 @@ O **CHAMADO** é uma ferramenta de terminal para Windows que funciona como um **
 - 🔍 **Diagnóstico automático** com sugestão de correções
 - 🌐 **Ferramentas de rede** completas (ping, DNS, Wi-Fi, traceroute)
 - 🔧 **Reparos** do Windows (SFC, DISM, Spooler, Windows Update)
-- 🎮 **Otimização para jogos** (Modo Seguro e Modo Agressivo)
+- 🎮 **Otimização para jogos** (Modo Seguro/Agressivo, Instalação do DirectX Legacy)
 - 🛡️ **Segurança** (Defender, Firewall, BitLocker, RDP)
 - 🧹 **Limpeza profunda** com relatório de espaço liberado
 - 💾 **Backup rápido** (Ninja Backup) com Robocopy
@@ -115,7 +115,7 @@ Contribuições são muito bem-vindas! Como o projeto é modular, você pode:
 - 🔍 **Auto-diagnostic** with suggested fixes
 - 🌐 **Network tools** (ping, DNS, Wi-Fi passwords, traceroute)
 - 🔧 **Windows repairs** (SFC, DISM, Spooler, Windows Update)
-- 🎮 **Gaming optimization** (Safe Mode & Aggressive Mode)
+- 🎮 **Gaming optimization** (Safe/Aggressive Mode, DirectX Legacy Installer)
 - 🛡️ **Security** (Defender, Firewall, BitLocker, RDP)
 - 🧹 **Deep cleanup** with freed space report
 - 💾 **Quick backup** (Ninja Backup) with Robocopy

@@ -2,6 +2,14 @@
 
 Todas as mudanças notáveis do projeto serão documentadas neste arquivo.
 
+## [2.1.0] - 2026-10-08
+
+### Adicionado
+- **DirectX Legacy**: Nova opção na otimização de jogos para baixar e instalar silenciosamente dlls do DX9/10 (ex: d3dx9_43.dll) para corrigir crashes em jogos clássicos.
+- **Analisador de Disco em C#**: Módulo ultrarrápido que supera as limitações do PowerShell (caminhos longos, Access Denied) para mapear os maiores arquivos.
+- **Impressoras de Rede**: Novo módulo integrado ao menu que escaneia a rede (Ping/ARP), localiza portas (9100/515) e instala portas TCP/IP padrão.
+- **Pós-Formatação Avançada**: Expandido para 13 categorias e mais de 110 programas mapeados via Gerenciador de Pacotes do Windows (Winget), incluindo pacotes automáticos.
+
 ## [2.0.0] - 2026-09-28
 
 ### Adicionado
