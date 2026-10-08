@@ -1,4 +1,4 @@
-﻿# ==============================================================================
+# ==============================================================================
 # MÓDULO: Otimização para Jogos (Gaming Mode)
 # ==============================================================================
 
@@ -22,6 +22,7 @@ function Invoke-MenuGaming {
         Write-MenuOption "8"  "Desativar Cortana / Widgets"
         Write-MenuOption "9"  "Desativar Prefetch/Superfetch (SSD)"
         Write-MenuOption "10" "Limpar RAM em Standby"
+        Write-MenuOption "11" "Verificar/Instalar DirectX Legacy (Corrige erros .dll em jogos)"
         Write-Host ""
         Write-MenuOption "R"  "REVERTER TUDO (Restaurar padrões)" "Yellow"
         Write-MenuOption "0"  "Voltar ao Menu Principal"
@@ -39,6 +40,7 @@ function Invoke-MenuGaming {
             "8"  { Disable-CortanaWidgets }
             "9"  { Disable-PrefetchSuperfetch }
             "10" { Clear-StandbyRAM }
+            "11" { Install-DirectXLegacy }
             "R"  { Invoke-GamingRevert }
             "r"  { Invoke-GamingRevert }
             "0"  { $loop = $false }
@@ -260,6 +262,28 @@ function Clear-StandbyRAM {
     
     Write-Status "RAM otimizada. ~$($freed)MB liberados." "OK"
     Write-Log "Standby RAM limpa."
+}
+
+function Install-DirectXLegacy {
+    Write-Host "   Baixando DirectX End-User Runtime Web Installer..." -ForegroundColor Yellow
+    $url = "https://download.microsoft.com/download/1/7/1/1718CCC4-6315-4D8E-9543-8E28A4E18C4C/dxwebsetup.exe"
+    $tempFile = Join-Path $env:TEMP "dxwebsetup.exe"
+    
+    try {
+        Invoke-WebRequest -Uri $url -OutFile $tempFile -UseBasicParsing -ErrorAction Stop
+        Write-Host "   Instalando o DirectX (Isso pode demorar alguns minutos)..." -ForegroundColor Yellow
+        $process = Start-Process -FilePath $tempFile -ArgumentList "/Q" -Wait -PassThru
+        if ($process.ExitCode -eq 0) {
+            Write-Status "DirectX Legacy instalado/verificado com sucesso!" "OK"
+            Write-Log "DirectX Legacy instalado."
+        } else {
+            Write-Status "A instalação do DirectX retornou o código $($process.ExitCode)." "WARN"
+        }
+    } catch {
+        Write-Status "Erro ao baixar ou instalar o DirectX: $($_.Exception.Message)" "ERRO"
+    } finally {
+        if (Test-Path $tempFile) { Remove-Item $tempFile -Force -ErrorAction SilentlyContinue }
+    }
 }
 
 function Invoke-GamingRevert {
